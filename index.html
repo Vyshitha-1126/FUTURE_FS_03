@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ember Roasters — Specialty Coffee, Roasted Local</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --bg: #0e0c0a;
+    --bg-warm: #151210;
+    --bg-card: #1c1916;
+    --bg-card-hover: #242019;
+    --fg: #f2ece3;
+    --fg-soft: #c9bfb0;
+    --fg-muted: #8a7e6f;
+    --fg-dim: #5a5247;
+    --accent: #c8783a;
+    --accent-light: #e09355;
+    --accent-dim: rgba(200,120,58,0.12);
+    --accent-glow: rgba(200,120,58,0.2);
+    --cream: #f5efe5;
+    --cream-dim: rgba(245,239,229,0.06);
+    --border: #2a2520;
+    --border-light: #3a332b;
+    --radius: 10px;
+    --radius-lg: 18px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.5);
+    --shadow-lg: 0 16px 64px rgba(0,0,0,0.6);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* Grain overlay for texture */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
+
+  ::-webkit-scrollbar { width: 7px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+  /* ===== NAVBAR ===== */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0 40px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
+  }
+  .navbar.scrolled {
+    background: rgba(14,12,10,0.85);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 var(--border);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fg);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-brand .flame {
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 23c-4.97 0-9-3.58-9-8 0-3.07 2.09-5.64 4-7.31C8.08 6.78 8.5 5 9 3.5c1 2.5 3 4 4.5 5.5C15.25 10.75 17 13 17 15.5c0 1.5-.5 2.5-1.5 3.5-.75.75-2 1.5-3.5 2.5 0-1-.5-2-1.5-2.5-.75-.38-1.5-.25-2 .25-.4.4-.5 1-.5 1.75 0 .75.25 1.25.5 2z'/%3E%3C/svg%3E") center/contain no-repeat;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 23c-4.97 0-9-3.58-9-8 0-3.07 2.09-5.64 4-7.31C8.08 6.78 8.5 5 9 3.5c1 2.5 3 4 4.5 5.5C15.25 10.75 17 13 17 15.5c0 1.5-.5 2.5-1.5 3.5-.75.75-2 1.5-3.5 2.5 0-1-.5-2-1.5-2.5-.75-.38-1.5-.25-2 .25-.4.4-.5 1-.5 1.75 0 .75.25 1.25.5 2z'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--fg-soft);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.3s;
+    border-radius: 1px;
+  }
+  .nav-links a:hover { color: var(--fg); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    padding: 9px 20px;
+    background: var(--accent);
+    color: var(--bg) !important;
+    border-radius: 8px;
+    font-weight: 600 !important;
+    transition: background 0.2s, transform 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--accent-light); transform: translateY(-1px); }
+  .nav-cta::after { display: none !important; }
+
+  .nav-mobile-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--fg);
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  /* Mobile nav */
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: rgba(14,12,10,0.96);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    z-index: 999;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mobile-nav.open { display: flex; }
+  .mobile-nav a {
+    color: var(--fg-soft);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    display: block;
+    transition: color 0.2s;
+  }
+  .mobile-nav a:last-child { border-bottom: none; }
+  .mobile-nav a:hover { color: var(--accent); }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 100px 40px 80px;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.3) saturate(0.7);
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(14,12,10,0.92) 0%, rgba(14,12,10,0.5) 50%, rgba(14,12,10,0.3) 100%);
+  }
+  .hero-glow {
+    position: absolute;
+    bottom: -20%;
+    right: 10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 1;
+    animation: heroGlow 8s ease-in-out infinite alternate;
+  }
+  @keyframes heroGlow {
+    0% { transform: translate(0,0) scale(1); opacity: 0.6; }
+    100% { transform: translate(-40px, -30px) scale(1.15); opacity: 1; }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 680px;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(200,120,58,0.2);
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-light);
+    margin-bottom: 28px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .hero-tag .pulse-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulseDot 2s ease-in-out infinite;
+  }
+  @keyframes pulseDot {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.08;
+    margin-bottom: 24px;
+    color: var(--fg);
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-desc {
+    font-size: 18px;
+    color: var(--fg-soft);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 520px;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  /* Steam particles canvas */
+  #steamCanvas {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    outline: none;
+    white-space: nowrap;
+  }
+  .btn:focus-visible { box-shadow: 0 0 0 3px var(--accent-dim); }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .btn-primary:hover { background: var(--accent-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,120,58,0.3); }
+  .btn-outline {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--border-light);
+  }
+  .btn-outline:hover { border-color: var(--fg-muted); background: var(--cream-dim); }
+
+  /* ===== SECTIONS ===== */
+  section {
+    padding: 100px 40px;
+    position: relative;
+  }
+  .section-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .section-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 46px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .section-subtitle {
+    font-size: 17px;
+    color: var(--fg-muted);
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ===== ABOUT STRIP ===== */
+  .about-strip {
+    background: var(--bg-warm);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px;
+  }
+  .about-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .about-image {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    aspect-ratio: 4/3;
+  }
+  .about-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s;
+  }
+  .about-image:hover img { transform: scale(1.04); }
+  .about-image-badge {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(14,12,10,0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .about-image-badge .number {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .about-image-badge .text {
+    font-size: 12px;
+    color: var(--fg-soft);
+    line-height: 1.4;
+  }
+  .about-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  .about-text p {
+    color: var(--fg-soft);
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+  .about-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+  .about-stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .about-stat-label {
+    font-size: 13px;
+    color: var(--fg-muted);
+    margin-top: 2px;
+  }
+
+  /* ===== MENU ===== */
+  .menu-section { background: var(--bg); }
+  .menu-filters {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+  .menu-filter-btn {
+    padding: 9px 20px;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--fg-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .menu-filter-btn:hover { border-color: var(--fg-dim); color: var(--fg-soft); }
+  .menu-filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+  .menu-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all 0.3s;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .menu-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .menu-card:hover {
+    border-color: var(--border-light);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .menu-card-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  .menu-card:hover .menu-card-img { transform: scale(1.06); }
+  .menu-card-img-wrap { overflow: hidden; position: relative; }
+  .menu-card-tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tag-popular { background: var(--accent); color: var(--bg); }
+  .tag-new { background: var(--bg); color: var(--fg); border: 1px solid var(--border); }
+  .tag-seasonal { background: rgba(52,211,153,0.15); color: #34d399; }
+  .menu-card-body { padding: 20px; }
+  .menu-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .menu-card-desc {
+    font-size: 14px;
+    color: var(--fg-muted);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .menu-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .menu-card-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .menu-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--fg-dim);
+  }
+
+  /* ===== EXPERIENCE ===== */
+  .experience-section {
+    background: var(--bg-warm);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .exp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .exp-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px 28px;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .exp-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 0 0 2px 2px;
+    opacity: 0;
+    transition: opacity 0.3s, width 0.3s;
+  }
+  .exp-card:hover::before { opacity: 1; width: 100px; }
+  .exp-card:hover { transform: translateY(-4px); border-color: var(--border-light); }
+  .exp-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 20px;
+    border-radius: 14px;
+    background: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--accent);
+  }
+  .exp-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .exp-card p {
+    font-size: 14px;
+    color: var(--fg-muted);
+    line-height: 1.7;
+  }
+
+  /* ===== TESTIMONIALS ===== */
+  .testimonials-track {
+    display: flex;
+    gap: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+  .testimonial-card {
+    min-width: 380px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    flex-shrink: 0;
+    transition: all 0.5s;
+  }
+  .testimonial-stars {
+    color: var(--accent);
+    font-size: 14px;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+  .testimonial-text {
+    font-size: 15px;
+    color: var(--fg-soft);
+    line-height: 1.75;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .testimonial-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .testimonial-name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .testimonial-role {
+    font-size: 13px;
+    color: var(--fg-dim);
+  }
+  .testimonials-nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 36px;
+  }
+  .testimonials-nav button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--fg-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .testimonials-nav button:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ===== BEAN CTA ===== */
+  .bean-cta {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .bean-cta-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .bean-cta-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.2) saturate(0.6);
+  }
+  .bean-cta-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, var(--bg) 0%, transparent 30%, transparent 70%, var(--bg) 100%);
+  }
+  .bean-cta-content {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .bean-cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(30px, 4vw, 44px);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .bean-cta p {
+    font-size: 17px;
+    color: var(--fg-soft);
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  /* ===== CONTACT ===== */
+  .contact-section {
+    background: var(--bg-warm);
+    border-top: 1px solid var(--border);
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+  .contact-info h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .contact-info > p {
+    color: var(--fg-muted);
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .contact-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .contact-detail-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .contact-detail-label {
+    font-size: 13px;
+    color: var(--fg-dim);
+    margin-bottom: 2px;
+  }
+  .contact-detail-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--fg-soft);
+  }
+  .contact-detail-value a {
+    color: var(--fg-soft);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .contact-detail-value a:hover { color: var(--accent); }
+
+  .hours-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .hours-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 6px 0;
+  }
+  .hours-day { color: var(--fg-muted); }
+  .hours-time { color: var(--fg-soft); font-weight: 500; }
+  .hours-row.highlight .hours-time { color: var(--accent); }
+
+  .contact-form-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 36px;
+  }
+  .contact-form-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .form-group {
+    margin-bottom: 18px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg-muted);
+    margin-bottom: 6px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--fg);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+  .form-input::placeholder { color: var(--fg-dim); }
+  textarea.form-input { resize: vertical; min-height: 100px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-success {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .form-success.visible { display: block; }
+  .form-success i {
+    font-size: 48px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .form-success h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  .form-success p { color: var(--fg-muted); font-size: 15px; }
+
+  /* ===== MAP ===== */
+  .map-container {
+    margin-top: 48px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    height: 300px;
+    position: relative;
+    background: var(--bg-card);
+  }
+  .map-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--fg-dim);
+    font-size: 15px;
+  }
+  .map-placeholder i { font-size: 36px; color: var(--accent); opacity: 0.5; }
+  .map-pin {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    z-index: 2;
+    animation: mapBounce 2s ease-in-out infinite;
+  }
+  .map-pin-body {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .map-pin-body i {
+    transform: rotate(45deg);
+    color: var(--bg);
+    font-size: 13px;
+  }
+  .map-pin-shadow {
+    width: 20px;
+    height: 6px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    margin: 4px auto 0;
+  }
+  @keyframes mapBounce {
+    0%,100% { transform: translate(-50%, -100%); }
+    50% { transform: translate(-50%, -108%); }
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 60px 40px 30px;
+    background: var(--bg);
+  }
+  .footer-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 48px;
+  }
+  .footer-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .footer-desc {
+    font-size: 14px;
+    color: var(--fg-muted);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    max-width: 300px;
+  }
+  .footer-socials {
+    display: flex;
+    gap: 10px;
+  }
+  .footer-socials a {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fg-muted);
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 14px;
+  }
+  .footer-socials a:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .footer-col-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--fg-dim);
+    margin-bottom: 16px;
+  }
+  .footer-col a {
+    display: block;
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 14px;
+    padding: 5px 0;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--accent); }
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--fg-dim);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* ===== SCROLL REVEAL ===== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+  }
+  .reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== TOAST ===== */
+  .toast-container {
+    position: fixed;
+    top: 90px;
+    right: 24px;
+    z-index: 9000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .toast {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    animation: toastIn 0.3s ease-out;
+    min-width: 260px;
+  }
+  .toast.removing { animation: toastOut 0.3s ease-in forwards; }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(40px); } }
+  .toast-success i { color: #34d399; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    section { padding: 70px 24px; }
+    .navbar { padding: 0 24px; }
+    .nav-links { display: none; }
+    .nav-mobile-toggle { display: flex; }
+    .about-grid { grid-template-columns: 1fr; gap: 36px; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .exp-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .testimonial-card { min-width: 300px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    section { padding: 56px 18px; }
+    .hero { padding: 90px 18px 60px; }
+    .menu-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+    .about-stats { flex-direction: column; gap: 16px; }
+    .hours-grid { grid-template-columns: 1fr; }
+    .testimonial-card { min-width: 280px; padding: 24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+  <a href="#" class="nav-brand">
+    <span class="flame"></span>
+    Ember Roasters
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">Our Story</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#contact" class="nav-cta">Visit Us</a></li>
+  </ul>
+  <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+    <i class="fas fa-bars" id="mobileIcon"></i>
+  </button>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="#about" onclick="closeMobile()">Our Story</a>
+  <a href="#menu" onclick="closeMobile()">Menu</a>
+  <a href="#experience" onclick="closeMobile()">Experience</a>
+  <a href="#reviews" onclick="closeMobile()">Reviews</a>
+  <a href="#contact" onclick="closeMobile()">Visit Us</a>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="https://picsum.photos/seed/ember-coffee-dark/1920/1080.jpg" alt="Coffee beans and roasting atmosphere">
+  </div>
+  <canvas id="steamCanvas"></canvas>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="pulse-dot"></span>
+      Roasted Fresh Daily
+    </div>
+    <h1>Every Cup Tells a <em>Story</em></h1>
+    <p class="hero-desc">
+      Single-origin beans roasted in small batches right here in downtown Portland. 
+      From farm to cup, we obsess over every detail so you don't have to.
+    </p>
+    <div class="hero-actions">
+      <a href="#menu" class="btn btn-primary"><i class="fas fa-mug-hot"></i> Explore Menu</a>
+      <a href="#about" class="btn btn-outline"><i class="fas fa-play"></i> Our Story</a>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section class="about-strip" id="about">
+  <div class="about-grid">
+    <div class="about-image reveal">
+      <img src="https://picsum.photos/seed/roaster-machine/800/600.jpg" alt="Coffee roasting machine in action">
+      <div class="about-image-badge">
+        <span class="number">8</span>
+        <span class="text">Years roasting<br>in Portland</span>
+      </div>
+    </div>
+    <div class="about-text reveal">
+      <span class="section-label">Our Story</span>
+      <h2>Born from Obsession,<br>Not Opportunity</h2>
+      <p>
+        Ember started in 2016 with a second-hand Probat roaster and a stubborn belief that 
+        coffee could be so much more than a morning habit. We source directly from farmers 
+        in Ethiopia, Colombia, and Guatemala — paying well above fair-trade minimums because 
+        great coffee starts with respected growers.
+      </p>
+      <p>
+        Every Tuesday and Friday, we roast in our open-air studio so you can smell the 
+        transformation happening in real time. No shortcuts, no blends you can't trace, 
+        no compromises on freshness.
+      </p>
+      <div class="about-stats">
+        <div>
+          <div class="about-stat-value">12+</div>
+          <div class="about-stat-label">Farm Partners</div>
+        </div>
+        <div>
+          <div class="about-stat-value">40k</div>
+          <div class="about-stat-label">Cups Served</div>
+        </div>
+        <div>
+          <div class="about-stat-value">4.9</div>
+          <div class="about-stat-label">Google Rating</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Menu -->
+<section class="menu-section" id="menu">
+  <div class="section-container">
+    <div class="section-header reveal">
+      <span class="section-label">The Menu</span>
+      <h2 class="section-title">Crafted With Intention</h2>
+      <p class="section-subtitle">Each drink is prepared by hand, using beans roasted within the last 72 hours. No syrups from bottles — everything is house-made.</p>
+    </div>
+
+    <div class="menu-filters reveal" id="menuFilters" role="tablist">
+      <button class="menu-filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+      <button class="menu-filter-btn" data-filter="espresso" role="tab">Espresso</button>
+      <button class="menu-filter-btn" data-filter="pourover" role="tab">Pour Over</button>
+      <button class="menu-filter-btn" data-filter="cold" role="tab">Cold</button>
+      <button class="menu-filter-btn" data-filter="seasonal" role="tab">Seasonal</button>
+    </div>
+
+    <div class="menu-grid" id="menuGrid"></div>
+  </div>
+</section>
+
+<!-- Experience -->
+<section class="experience-section" id="experience">
+  <div class="section-container">
+    <div class="section-header reveal">
+      <span class="section-label">The Experience</span>
+      <h2 class="section-title">More Than a Coffee Shop</h2>
+      <p class="section-subtitle">We built Ember to be a place where you slow down, taste something remarkable, and maybe learn something new.</p>
+    </div>
+    <div class="exp-grid">
+      <div class="exp-card reveal">
+        <div class="exp-icon"><i class="fas fa-fire-flame-curved"></i></div>
+        <h3>Open-Air Roasting</h3>
+        <p>Watch our roasters work every Tuesday and Friday. Smell the green-to-brown transformation. Ask questions — we love nerding out about Maillard reactions.</p>
+      </div>
+      <div class="exp-card reveal">
+        <div class="exp-icon"><i class="fas fa-seedling"></i></div>
+        <h3>Farm Traceability</h3>
+        <p>Scan the QR code on any bag to see the exact farm, elevation, varietal, and processing method. Full transparency, zero marketing fluff.</p>
+      </div>
+      <div class="exp-card reveal">
+        <div class="exp-icon"><i class="fas fa-graduation-cap"></i></div>
+        <h3>Cupping Classes</h3>
+        <p>Free monthly tasting sessions where you learn to identify flavor notes like a pro. Limited to 12 people — sign up at the counter.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section id="reviews">
+  <div class="section-container">
+    <div class="section-header reveal">
+      <span class="section-label">Reviews</span>
+      <h2 class="section-title">What People Are Saying</h2>
+      <p class="section-subtitle">Real words from real customers who keep coming back.</p>
+    </div>
+    <div class="testimonials-track reveal" id="testimonialsTrack"></div>
+    <div class="testimonials-nav">
+      <button onclick="slideTestimonials(-1)" aria-label="Previous review"><i class="fas fa-arrow-left"></i></button>
+      <button onclick="slideTestimonials(1)" aria-label="Next review"><i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+</section>
+
+<!-- Bean CTA -->
+<section class="bean-cta">
+  <div class="bean-cta-bg">
+    <img src="https://picsum.photos/seed/coffee-beans-close/1920/800.jpg" alt="Close-up of roasted coffee beans">
+  </div>
+  <div class="bean-cta-content reveal">
+    <span class="section-label">Subscription</span>
+    <h2>Fresh Beans at Your Door</h2>
+    <p>Join our roast club and get freshly roasted single-origin beans delivered every two weeks. Cancel anytime — no lock-in, no guilt.</p>
+    <a href="#contact" class="btn btn-primary"><i class="fas fa-box"></i> Start Subscription</a>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact-section" id="contact">
+  <div class="section-container">
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <span class="section-label">Get In Touch</span>
+        <h2>Come Say Hello</h2>
+        <p>Whether you want a quiet corner to work, a quick espresso, or to discuss a wholesale order — we're here. Walk-ins always welcome.</p>
+
+        <div class="contact-detail">
+          <div class="contact-detail-icon"><i class="fas fa-location-dot"></i></div>
+          <div>
+            <div class="contact-detail-label">Address</div>
+            <div class="contact-detail-value">742 SE Division St, Portland, OR 97202</div>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon"><i class="fas fa-phone"></i></div>
+          <div>
+            <div class="contact-detail-label">Phone</div>
+            <div class="contact-detail-value"><a href="tel:+15035551234">(503) 555-1234</a></div>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon"><i class="fas fa-envelope"></i></div>
+          <div>
+            <div class="contact-detail-label">Email</div>
+            <div class="contact-detail-value"><a href="mailto:hello@emberroasters.com">hello@emberroasters.com</a></div>
+          </div>
+        </div>
+
+        <div class="hours-grid">
+          <div class="hours-row"><span class="hours-day">Mon — Thu</span><span class="hours-time">7:00 — 18:00</span></div>
+          <div class="hours-row"><span class="hours-day">Friday</span><span class="hours-time">7:00 — 20:00</span></div>
+          <div class="hours-row highlight"><span class="hours-day">Saturday</span><span class="hours-time">8:00 — 20:00</span></div>
+          <div class="hours-row"><span class="hours-day">Sunday</span><span class="hours-time">8:00 — 16:00</span></div>
+        </div>
+      </div>
+
+      <div class="contact-form-card reveal">
+        <h3>Send Us a Message</h3>
+        <form id="contactForm" onsubmit="handleContactSubmit(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cfName">Your Name</label>
+              <input type="text" id="cfName" class="form-input" placeholder="Jane Doe" required>
+            </div>
+            <div class="form-group">
+              <label for="cfEmail">Email</label>
+              <input type="email" id="cfEmail" class="form-input" placeholder="jane@email.com" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="cfSubject">Subject</label>
+            <select id="cfSubject" class="form-input">
+              <option value="general">General Inquiry</option>
+              <option value="wholesale">Wholesale Order</option>
+              <option value="subscription">Roast Club Subscription</option>
+              <option value="event">Private Event / Cupping</option>
+              <option value="feedback">Feedback</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cfMessage">Message</label>
+            <textarea id="cfMessage" class="form-input" placeholder="Tell us what's on your mind..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" style="width:100%">
+            <i class="fas fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+        <div class="form-success" id="formSuccess">
+          <i class="fas fa-check-circle"></i>
+          <h3>Message Sent</h3>
+          <p>We'll get back to you within 24 hours. Thanks for reaching out!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-container reveal">
+      <div class="map-pin">
+        <div class="map-pin-body"><i class="fas fa-mug-hot"></i></div>
+        <div class="map-pin-shadow"></div>
+      </div>
+      <div class="map-placeholder">
+        <i class="fas fa-map-marked-alt"></i>
+        <span>742 SE Division St, Portland, OR 97202</span>
+        <span style="font-size:13px;color:var(--fg-dim)">Interactive map loads with live deployment</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">
+        <span class="flame" style="width:18px;height:18px;background:var(--accent);mask:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 23c-4.97 0-9-3.58-9-8 0-3.07 2.09-5.64 4-7.31C8.08 6.78 8.5 5 9 3.5c1 2.5 3 4 4.5 5.5C15.25 10.75 17 13 17 15.5c0 1.5-.5 2.5-1.5 3.5-.75.75-2 1.5-3.5 2.5 0-1-.5-2-1.5-2.5-.75-.38-1.5-.25-2 .25-.4.4-.5 1-.5 1.75 0 .75.25 1.25.5 2z%22/%3E%3C/svg%3E') center/contain no-repeat;-webkit-mask:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M12 23c-4.97 0-9-3.58-9-8 0-3.07 2.09-5.64 4-7.31C8.08 6.78 8.5 5 9 3.5c1 2.5 3 4 4.5 5.5C15.25 10.75 17 13 17 15.5c0 1.5-.5 2.5-1.5 3.5-.75.75-2 1.5-3.5 2.5 0-1-.5-2-1.5-2.5-.75-.38-1.5-.25-2 .25-.4.4-.5 1-.5 1.75 0 .75.25 1.25.5 2z%22/%3E%3C/svg%3E') center/contain no-repeat;"></span>
+        Ember Roasters
+      </div>
+      <p class="footer-desc">Specialty coffee roasted with care in Portland, Oregon. Every bean has a name, every cup has a story.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+        <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Visit</div>
+      <a href="#menu">Full Menu</a>
+      <a href="#about">Our Story</a>
+      <a href="#experience">Roasting</a>
+      <a href="#reviews">Reviews</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Order</div>
+      <a href="#contact">Roast Club</a>
+      <a href="#contact">Wholesale</a>
+      <a href="#contact">Gift Cards</a>
+      <a href="#contact">Merch</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Connect</div>
+      <a href="#">Instagram</a>
+      <a href="#">Facebook</a>
+      <a href="#">TikTok</a>
+      <a href="mailto:hello@emberroasters.com">Email Us</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2024 Ember Roasters. All rights reserved.</span>
+    <span>Designed with intention in Portland, OR</span>
+  </div>
+</footer>
+
+<script>
+// ===========================
+// Menu Data
+// ===========================
+const menuItems = [
+  {
+    name: 'Classic Espresso',
+    desc: 'Double shot pulled from our house blend — chocolate-forward with a caramel finish.',
+    price: '$3.50',
+    category: 'espresso',
+    tag: null,
+    img: 'https://picsum.photos/seed/espresso-classic/600/400.jpg',
+    calories: '5 cal'
+  },
+  {
+    name: 'Oat Milk Cortado',
+    desc: 'Equal parts espresso and steamed oat milk. Our most ordered drink for a reason.',
+    price: '$5.00',
+    category: 'espresso',
+    tag: 'popular',
+    img: 'https://picsum.photos/seed/cortado-oat/600/400.jpg',
+    calories: '80 cal'
+  },
+  {
+    name: 'Honey Cinnamon Latte',
+    desc: 'House-made honey-cinnamon syrup with espresso and your choice of milk.',
+    price: '$5.75',
+    category: 'espresso',
+    tag: null,
+    img: 'https://picsum.photos/seed/honey-latte/600/400.jpg',
+    calories: '180 cal'
+  },
+  {
+    name: 'Ethiopian Yirgacheffe',
+    desc: 'Single-origin pour over. Bright, floral, with notes of blueberry and dark chocolate.',
+    price: '$6.00',
+    category: 'pourover',
+    tag: 'popular',
+    img: 'https://picsum.photos/seed/ethiopia-pour/600/400.jpg',
+    calories: '5 cal'
+  },
+  {
+    name: 'Colombian Supremo',
+    desc: 'Medium roast pour over. Caramel sweetness, red apple acidity, silky body.',
+    price: '$5.50',
+    category: 'pourover',
+    tag: null,
+    img: 'https://picsum.photos/seed/colombia-pour/600/400.jpg',
+    calories: '5 cal'
+  },
+  {
+    name: 'Guatemala Antigua',
+    desc: 'Rich and full-bodied with cocoa, spice, and a smoky finish. A classic.',
+    price: '$5.50',
+    category: 'pourover',
+    tag: null,
+    img: 'https://picsum.photos/seed/guatemala-pour/600/400.jpg',
+    calories: '5 cal'
+  },
+  {
+    name: 'Nitro Cold Brew',
+    desc: '24-hour steeped cold brew infused with nitrogen for a creamy, Guinness-like texture.',
+    price: '$5.50',
+    category: 'cold',
+    tag: 'popular',
+    img: 'https://picsum.photos/seed/nitro-cold/600/400.jpg',
+    calories: '10 cal'
+  },
+  {
+    name: 'Japanese Iced Coffee',
+    desc: 'Hot-brewed directly onto ice for bright, crisp flavor preservation. No dilution.',
+    price: '$5.00',
+    category: 'cold',
+    tag: null,
+    img: 'https://picsum.photos/seed/japanese-iced/600/400.jpg',
+    calories: '5 cal'
+  },
+  {
+    name: 'Cold Brew Tonic',
+    desc: 'Ember cold brew over artisan tonic water with a citrus twist. Surprisingly refreshing.',
+    price: '$6.50',
+    category: 'cold',
+    tag: 'new',
+    img: 'https://picsum.photos/seed/tonic-brew/600/400.jpg',
+    calories: '45 cal'
+  },
+  {
+    name: 'Cardamom Rose Latte',
+    desc: 'Espresso with house-made cardamom-rose syrup and steamed milk. Inspired by Middle Eastern coffee traditions.',
+    price: '$6.25',
+    category: 'seasonal',
+    tag: 'seasonal',
+    img: 'https://picsum.photos/seed/cardamom-rose/600/400.jpg',
+    calories: '160 cal'
+  },
+  {
+    name: 'Lavender Honey Cold Brew',
+    desc: 'Portland lavender infused into our cold brew with local wildflower honey. Summer in a cup.',
+    price: '$6.75',
+    category: 'seasonal',
+    tag: 'seasonal',
+    img: 'https://picsum.photos/seed/lavender-cold/600/400.jpg',
+    calories: '120 cal'
+  },
+  {
+    name: 'Spiced Maple Cortado',
+    desc: 'Fall favorite — cinnamon, nutmeg, and local maple syrup with a double shot cortado.',
+    price: '$6.00',
+    category: 'seasonal',
+    tag: 'seasonal',
+    img: 'https://picsum.photos/seed/maple-spiced/600/400.jpg',
+    calories: '110 cal'
+  }
+];
+
+// ===========================
+// Testimonials Data
+// ===========================
+const testimonials = [
+  {
+    text: "I've been to coffee shops all over the world, and Ember is genuinely one of the best. The Ethiopian pour over changed how I think about coffee.",
+    name: 'Marcus Rivera',
+    role: 'Food Photographer',
+    avatar: 'https://picsum.photos/seed/person-marcus/100/100.jpg'
+  },
+  {
+    text: "Finally, a roaster in Portland that doesn't over-roast everything. You can actually taste the origin here. The nitro cold brew is dangerously smooth.",
+    name: 'Sarah Kim',
+    role: 'Software Engineer',
+    avatar: 'https://picsum.photos/seed/person-sarah/100/100.jpg'
+  },
+  {
+    text: "We switched our restaurant's coffee supplier to Ember and our customers immediately noticed. The quality difference is impossible to ignore.",
+    name: 'David Chen',
+    role: 'Restaurant Owner',
+    avatar: 'https://picsum.photos/seed/person-david/100/100.jpg'
+  },
+  {
+    text: "The cupping class was such a cool experience. I went in knowing nothing and left being able to identify three different flavor notes. And it was free!",
+    name: 'Emily Foster',
+    role: 'Teacher',
+    avatar: 'https://picsum.photos/seed/person-emily/100/100.jpg'
+  },
+  {
+    text: "This place has soul. You can watch them roast, they tell you exactly where the beans come from, and the cortado is absolute perfection. My daily stop.",
+    name: 'James Okafor',
+    role: 'Architect',
+    avatar: 'https://picsum.photos/seed/person-james/100/100.jpg'
+  }
+];
+
+// ===========================
+// Render Menu
+// ===========================
+function renderMenu(filter = 'all') {
+  const grid = document.getElementById('menuGrid');
+  const filtered = filter === 'all' ? menuItems : menuItems.filter(i => i.category === filter);
+  
+  grid.innerHTML = filtered.map((item, idx) => {
+    const tagHTML = item.tag ? 
+      `<span class="menu-card-tag tag-${item.tag}">${item.tag === 'popular' ? 'Popular' : item.tag === 'new' ? 'New' : 'Seasonal'}</span>` : '';
+    return `
+      <div class="menu-card" style="transition-delay: ${idx * 60}ms" data-category="${item.category}">
+        <div class="menu-card-img-wrap">
+          ${tagHTML}
+          <img class="menu-card-img" src="${item.img}" alt="${item.name}" loading="lazy">
+        </div>
+        <div class="menu-card-body">
+          <div class="menu-card-name">${item.name}</div>
+          <div class="menu-card-desc">${item.desc}</div>
+          <div class="menu-card-footer">
+            <span class="menu-card-price">${item.price}</span>
+            <div class="menu-card-meta">
+              <span><i class="fas fa-fire-flame-simple"></i> ${item.calories}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Trigger animation
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      grid.querySelectorAll('.menu-card').forEach(card => card.classList.add('visible'));
+    });
+  });
+}
+
+// Menu filter buttons
+document.getElementById('menuFilters').addEventListener('click', e => {
+  const btn = e.target.closest('.menu-filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('.menu-filter-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  renderMenu(btn.dataset.filter);
+});
+
+// ===========================
+// Render Testimonials
+// ===========================
+let testimonialOffset = 0;
+
+function renderTestimonials() {
+  const track = document.getElementById('testimonialsTrack');
+  track.innerHTML = testimonials.map(t => `
+    <div class="testimonial-card">
+      <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+      <div class="testimonial-text">"${t.text}"</div>
+      <div class="testimonial-author">
+        <img class="testimonial-avatar" src="${t.avatar}" alt="${t.name}" loading="lazy">
+        <div>
+          <div class="testimonial-name">${t.name}</div>
+          <div class="testimonial-role">${t.role}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function slideTestimonials(dir) {
+  const track = document.getElementById('testimonialsTrack');
+  const cardWidth = track.querySelector('.testimonial-card').offsetWidth + 24;
+  const maxOffset = -(testimonials.length * cardWidth - track.parentElement.offsetWidth);
+  testimonialOffset += dir * -cardWidth;
+  testimonialOffset = Math.max(maxOffset, Math.min(0, testimonialOffset));
+  track.style.transform = `translateX(${testimonialOffset}px)`;
+}
+
+// ===========================
+// Contact Form
+// ===========================
+function handleContactSubmit(e) {
+  e.preventDefault();
+  const form = document.getElementById('contactForm');
+  const success = document.getElementById('formSuccess');
+  
+  // Simulate sending
+  form.style.display = 'none';
+  success.classList.add('visible');
+  showToast('Message sent successfully!');
+  
+  // Reset after 5 seconds
+  setTimeout(() => {
+    form.reset();
+    form.style.display = 'block';
+    success.classList.remove('visible');
+  }, 5000);
+}
+
+// ===========================
+// Toast
+// ===========================
+function showToast(message) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-success';
+  toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('removing');
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ===========================
+// Navbar scroll effect
+// ===========================
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+  const navbar = document.getElementById('navbar');
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+// ===========================
+// Mobile nav
+// ===========================
+document.getElementById('mobileToggle').addEventListener('click', () => {
+  const nav = document.getElementById('mobileNav');
+  const icon = document.getElementById('mobileIcon');
+  const isOpen = nav.classList.toggle('open');
+  icon.className = isOpen ? 'fas fa-times' : 'fas fa-bars';
+});
+
+function closeMobile() {
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('mobileIcon').className = 'fas fa-bars';
+}
+
+// ===========================
+// Scroll Reveal
+// ===========================
+function initScrollReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+// ===========================
+// Steam Particles
+// ===========================
+function initSteam() {
+  const canvas = document.getElementById('steamCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animId;
+
+  function resize() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      // Rise from bottom-right area
+      this.x = canvas.width * (0.6 + Math.random() * 0.35);
+      this.y = canvas.height + 10;
+      this.size = Math.random() * 40 + 20;
+      this.speedY = -(Math.random() * 0.6 + 0.2);
+      this.speedX = (Math.random() - 0.5) * 0.3;
+      this.opacity = Math.random() * 0.15 + 0.05;
+      this.life = 0;
+      this.maxLife = Math.random() * 300 + 200;
+    }
+    update() {
+      this.x += this.speedX + Math.sin(this.life * 0.01) * 0.2;
+      this.y += this.speedY;
+      this.size += 0.15;
+      this.life++;
+      this.opacity = Math.max(0, this.opacity * (1 - this.life / this.maxLife));
+      if (this.life > this.maxLife) this.reset();
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, Math.max(1, this.size), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200, 180, 160, ${this.opacity})`;
+      ctx.fill();
+    }
+  }
+
+  // Create particles
+  for (let i = 0; i < 25; i++) {
+    const p = new Particle();
+    p.life = Math.random() * p.maxLife; // Stagger
+    particles.push(p);
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    animId = requestAnimationFrame(animate);
+  }
+  animate();
+
+  // Respect reduced motion
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    cancelAnimationFrame(animId);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// ===========================
+// Init
+// ===========================
+document.addEventListener('DOMContentLoaded', () => {
+  renderMenu();
+  renderTestimonials();
+  initScrollReveal();
+  initSteam();
+});
+</script>
+</body>
+</html>
